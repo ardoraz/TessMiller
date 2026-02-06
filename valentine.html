@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Be My Valentine 💘</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #fff0f6, #f3f8ff);
+    }
+    .card {
+      background: white;
+      padding: 36px 28px;
+      border-radius: 18px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.12);
+      width: min(520px, 92vw);
+      text-align: center;
+      position: relative;
+    }
+    h1 { margin: 0 0 18px; font-size: 28px; }
+    p { margin: 0 0 22px; color: #444; }
+    .btns {
+      position: relative;
+      height: 130px; /* espacio para que NO se mueva */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+    button {
+      border: 0;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform .12s ease;
+    }
+    #yes {
+      background: #22c55e;
+      color: white;
+    }
+    #no {
+      background: #ef4444;
+      color: white;
+      position: absolute; /* clave para moverlo */
+      left: 55%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .msg {
+      margin-top: 18px;
+      font-weight: 700;
+      font-size: 18px;
+      color: #db2777;
+      min-height: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Would you be my Valentine? 💘</h1>
+    <p>I have a very serious question for you 😌</p>
+
+    <div class="btns" id="arena">
+      <button id="yes">Yes 💖</button>
+      <button id="no">No 🙃</button>
+    </div>
+
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <script>
+    const arena = document.getElementById("arena");
+    const noBtn = document.getElementById("no");
+    const yesBtn = document.getElementById("yes");
+    const msg = document.getElementById("msg");
+
+    // Coloca el botón NO dentro del "arena" de forma segura
+    function moveNoButton() {
+      const padding = 12;
+
+      const arenaRect = arena.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const maxX = arenaRect.width - btnRect.width - padding;
+      const maxY = arenaRect.height - btnRect.height - padding;
+
+      const x = padding + Math.random() * Math.max(1, maxX);
+      const y = padding + Math.random() * Math.max(1, maxY);
+
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top = `${y}px`;
+      noBtn.style.transform = `translate(0,0)`;
+    }
+
+    // Detecta cuando el cursor se acerca al NO
+    function handleMouseMove(e) {
+      const btnRect = noBtn.getBoundingClientRect();
+      const cx = btnRect.left + btnRect.width / 2;
+      const cy = btnRect.top + btnRect.height / 2;
+
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const dist = Math.hypot(dx, dy);
+
+      // distancia a partir de la cual huye
+      if (dist < 120) moveNoButton();
+    }
+
+    // En móvil: que huya al intentar tocarlo
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+
+    document.addEventListener("mousemove", handleMouseMove);
+
+    yesBtn.addEventListener("click", () => {
+      msg.textContent = "Yeeiii 💖 ¡esa es la respuesta correcta! 😍";
+      // opcional: deshabilitar el NO ya “para siempre”
+      noBtn.style.display = "none";
+    });
+
+    // Coloca el NO en un lugar random al cargar
+    window.addEventListener("load", () => {
+      // Forzamos posición absoluta en px dentro del arena
+      noBtn.style.left = "60%";
+      noBtn.style.top = "55%";
+      noBtn.style.transform = "translate(-50%, -50%)";
+      // y luego randomizamos
+      moveNoButton();
+    });
+  </script>
+</body>
+</html>
