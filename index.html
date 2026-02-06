@@ -1,355 +1,215 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tess Miller 💘 Valentine</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tess Miller 💘 Valentine</title>
 
-  <style>
-    :root{
-      --pink:#db2777;
-      --shadow:0 18px 45px rgba(0,0,0,.14);
-    }
+<style>
+:root{--pink:#db2777;--shadow:0 18px 45px rgba(0,0,0,.14);}
+body{
+  margin:0;height:100vh;display:grid;place-items:center;
+  font-family:system-ui,Segoe UI,Arial;
+  background:radial-gradient(circle at 30% 20%,#fff0f6,#f3f8ff,#fff);
+  overflow:hidden;
+}
+.card{
+  background:#fff;padding:48px 42px;border-radius:22px;
+  box-shadow:var(--shadow);width:min(900px,94vw);text-align:center;
+}
+h1{font-size:32px;margin:0 0 12px;}
+p{color:#444;margin:0 0 18px;}
 
-    body{
-      margin:0;
-      height:100vh;
-      display:grid;
-      place-items:center;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background:radial-gradient(circle at 30% 20%,#fff0f6 0%,#f3f8ff 55%,#ffffff 100%);
-      overflow:hidden;
-    }
+.btns{position:relative;height:200px;display:flex;gap:18px;justify-content:center;align-items:center;}
+button{
+  border:0;padding:12px 18px;border-radius:12px;
+  font-size:16px;font-weight:800;cursor:pointer;
+  box-shadow:0 10px 20px rgba(0,0,0,.1);
+}
+#yes{background:#22c55e;color:#fff;}
+#no{background:#ef4444;color:#fff;position:absolute;}
 
-    .card{
-      background:white;
-      padding:48px 42px;
-      border-radius:22px;
-      box-shadow:var(--shadow);
-      width:min(880px,94vw);
-      text-align:center;
-      position:relative;
-    }
+.msg{margin-top:16px;font-weight:900;color:var(--pink);}
+.heartWrap{display:none;justify-content:center;gap:8px;margin-top:12px;}
+.heart{width:26px;height:26px;background:var(--pink);transform:rotate(45deg);animation:beat 1s infinite;position:relative;}
+.heart:before,.heart:after{content:"";width:26px;height:26px;background:var(--pink);border-radius:50%;position:absolute;}
+.heart:before{left:-13px;}
+.heart:after{top:-13px;}
+@keyframes beat{50%{transform:rotate(45deg) scale(1.25);}}
 
-    h1{margin:0 0 14px;font-size:32px;}
-    p{margin:0 0 22px;color:#444;font-size:16px;}
+.afterYesBtns{display:none;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:14px;}
+#instructionsBtn{background:#111827;color:#fff;}
+#cancelBtn{background:#f97316;color:#fff;}
+#cancelBtn span{display:block;font-size:13px;margin-top:6px;}
 
-    .btns{
-      position:relative;
-      height:190px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:18px;
-    }
+.panel{
+  display:none;margin:18px auto 0;max-width:720px;
+  background:#fff;border:1px solid #ffd0e6;border-radius:16px;
+  padding:16px;text-align:left;
+}
 
-    button{
-      border:0;
-      padding:12px 18px;
-      border-radius:12px;
-      font-size:16px;
-      cursor:pointer;
-      user-select:none;
-      font-weight:800;
-      box-shadow:0 10px 20px rgba(0,0,0,.08);
-      transition:transform .12s ease,opacity .2s ease;
-    }
+.final{display:none;font-weight:900;font-size:18px;margin-top:16px;}
+.reload{display:none;font-size:20px;font-weight:900;}
 
-    #yes{background:#22c55e;color:white;min-width:130px;}
-    #no{background:#ef4444;color:white;position:absolute;}
-
-    .msg{
-      margin-top:18px;
-      font-weight:900;
-      font-size:18px;
-      color:var(--pink);
-      min-height:28px;
-    }
-
-    .heartWrap{
-      margin-top:12px;
-      display:none;
-      justify-content:center;
-      gap:10px;
-    }
-
-    .heart{
-      width:28px;height:28px;
-      background:var(--pink);
-      transform:rotate(45deg);
-      position:relative;
-      animation:beat 1s infinite;
-      border-radius:6px;
-    }
-
-    .heart:before,.heart:after{
-      content:"";
-      width:28px;height:28px;
-      background:var(--pink);
-      position:absolute;
-      border-radius:50%;
-    }
-    .heart:before{left:-14px;}
-    .heart:after{top:-14px;}
-
-    @keyframes beat{
-      50%{transform:rotate(45deg) scale(1.25);}
-    }
-
-    .afterYesBtns{
-      display:none;
-      margin-top:16px;
-      gap:12px;
-      justify-content:center;
-      flex-wrap:wrap;
-    }
-
-    .afterYesBtns button{min-width:300px;}
-
-    #instructionsBtn{background:#111827;color:white;}
-    #cancelBtn{background:#f97316;color:white;}
-
-    #cancelBtn span{
-      display:block;
-      margin-top:6px;
-      font-size:13px;
-      opacity:.95;
-      font-weight:650;
-    }
-
-    .panel{
-      display:none;
-      margin:18px auto 0;
-      max-width:720px;
-      background:linear-gradient(135deg,#fff7fb,#fff);
-      border:1px solid #ffd0e6;
-      border-radius:16px;
-      padding:16px;
-      text-align:left;
-    }
-
-    .finalCountdown{
-      display:none;
-      margin-top:16px;
-      font-weight:900;
-      color:#111827;
-      font-size:17px;
-    }
-
-    .pop{
-      position:fixed;
-      font-size:26px;
-      animation:pop 650ms ease-out forwards;
-      pointer-events:none;
-      filter:drop-shadow(0 10px 14px rgba(0,0,0,.18));
-    }
-
-    @keyframes pop{
-      0%{transform:scale(.7);opacity:1;}
-      100%{transform:scale(1.3) translate(var(--dx),var(--dy));opacity:0;}
-    }
-
-    .hidden{display:none!important;}
-
-    /* Mensaje final al final de TODO */
-    .reloadMsg{
-      display:none;
-      font-size:20px;
-      font-weight:900;
-      color:#111827;
-      background:white;
-      padding:18px 18px;
-      border-radius:18px;
-      box-shadow:var(--shadow);
-      text-align:center;
-      width:min(740px,92vw);
-    }
-  </style>
+.pop{position:fixed;font-size:26px;animation:pop .7s forwards;}
+@keyframes pop{to{transform:translate(var(--dx),var(--dy)) scale(1.3);opacity:0;}}
+.hidden{display:none!important;}
+</style>
 </head>
 
 <body>
-  <div class="card" id="card">
-    <h1>Tess Miller (a.k.a. mi guapa), would you be my Valentine? 💘</h1>
-    <p>FYI there is only one right answer 👀💖</p>
 
-    <div class="btns" id="arena">
-      <button id="yes">Yes 💖</button>
-      <button id="no">No 🙃</button>
-    </div>
+<div class="card" id="card">
+  <h1>Tess Miller (a.k.a. mi guapa), would you be my Valentine? 💘</h1>
+  <p>FYI there is only one right answer 👀💖</p>
 
-    <div class="msg" id="msg"></div>
-
-    <div class="heartWrap" id="heartWrap">
-      <div class="heart"></div><div class="heart"></div><div class="heart"></div>
-    </div>
-
-    <div class="afterYesBtns" id="afterYesBtns">
-      <button id="instructionsBtn">Click here for instructions</button>
-      <button id="cancelBtn">CANCEL INVITE<span>(do not press)</span></button>
-    </div>
-
-    <div class="panel" id="instructionsPanel">
-      <p>
-        You are cordially invited to your first Valentine’s Day with your sexy Spaniard
-        on February 14 at 7:00 PM, at 903 LAKE LILY DR APT A410,
-        Quadrant A3 (the kitchen bar).
-        <br><br>
-        See ya soon, ti adoro 💖
-      </p>
-      <div class="heartWrap" style="display:flex;margin-top:10px;">
-        <div class="heart"></div>
-      </div>
-    </div>
-
-    <div class="finalCountdown" id="finalCountdown"></div>
+  <div class="btns" id="arena">
+    <button id="yes">Yes 💖</button>
+    <button id="no">No 🙃</button>
   </div>
 
-  <div class="reloadMsg" id="reloadMsg">
-    Reload the website to see this message again 😘
+  <div class="msg" id="msg"></div>
+
+  <div class="heartWrap" id="hearts">
+    <div class="heart"></div><div class="heart"></div><div class="heart"></div>
   </div>
 
-  <script>
-    const card=document.getElementById("card");
-    const arena=document.getElementById("arena");
-    const noBtn=document.getElementById("no");
-    const yesBtn=document.getElementById("yes");
-    const msg=document.getElementById("msg");
-    const heartWrap=document.getElementById("heartWrap");
-    const afterYesBtns=document.getElementById("afterYesBtns");
-    const instructionsBtn=document.getElementById("instructionsBtn");
-    const cancelBtn=document.getElementById("cancelBtn");
-    const instructionsPanel=document.getElementById("instructionsPanel");
-    const finalCountdown=document.getElementById("finalCountdown");
-    const reloadMsg=document.getElementById("reloadMsg");
+  <div class="afterYesBtns" id="afterYes">
+    <button id="instructionsBtn">Click here for instructions</button>
+    <button id="cancelBtn">CANCEL INVITE<span>(do not press)</span></button>
+  </div>
 
-    let stage=0;
+  <div class="panel" id="instructions">
+    <p>
+      You are cordially invited to your first Valentine’s Day with your sexy Spaniard
+      on February 14 at 7:00 PM, at 903 LAKE LILY DR APT A410,
+      Quadrant A3 (the kitchen bar).
+      <br><br>See ya soon, ti adoro 💖
+    </p>
+  </div>
 
-    function move(btn){
-      const r=arena.getBoundingClientRect(), b=btn.getBoundingClientRect();
-      btn.style.position="absolute";
-      btn.style.left=Math.random()*(r.width-b.width)+"px";
-      btn.style.top=Math.random()*(r.height-b.height)+"px";
+  <div class="final" id="final"></div>
+</div>
+
+<div class="reload" id="reload">
+  Reload the website to see this message again 😘
+</div>
+
+<script>
+const arena=document.getElementById("arena");
+const noBtn=document.getElementById("no");
+const yesBtn=document.getElementById("yes");
+const cancelBtn=document.getElementById("cancelBtn");
+const instructionsBtn=document.getElementById("instructionsBtn");
+const instructions=document.getElementById("instructions");
+const final=document.getElementById("final");
+const reload=document.getElementById("reload");
+const hearts=document.getElementById("hearts");
+const afterYes=document.getElementById("afterYes");
+const msg=document.getElementById("msg");
+const card=document.getElementById("card");
+
+let cancelFinished=false;
+let instructionsOpened=false;
+let stage=0;
+
+function move(btn){
+  const r=arena.getBoundingClientRect(),b=btn.getBoundingClientRect();
+  btn.style.position="absolute";
+  btn.style.left=Math.random()*(r.width-b.width)+"px";
+  btn.style.top=Math.random()*(r.height-b.height)+"px";
+}
+function evade(btn){
+  if(btn.dataset.evade)return;
+  document.addEventListener("mousemove",e=>{
+    const r=btn.getBoundingClientRect();
+    if(Math.hypot(e.clientX-(r.left+r.width/2),e.clientY-(r.top+r.height/2))<140)move(btn);
+  });
+  btn.dataset.evade=1;
+}
+
+evade(noBtn); window.onload=()=>move(noBtn);
+
+yesBtn.onclick=()=>{
+  msg.textContent="Yeeiii 💖 that’s the right answer! 😍";
+  hearts.style.display="flex";
+  afterYes.style.display="flex";
+  noBtn.classList.add("hidden");
+};
+
+instructionsBtn.onclick=()=>{
+  instructionsOpened=true;
+  instructions.style.display="block";
+  maybeFinal();
+};
+
+function explode(count=30){
+  for(let i=0;i<count;i++){
+    const e=document.createElement("div");
+    e.className="pop";
+    e.textContent=["💥","💖","✨","🔥"][Math.floor(Math.random()*4)];
+    e.style.setProperty("--dx",(Math.random()*500-250)+"px");
+    e.style.setProperty("--dy",(Math.random()*400-200)+"px");
+    e.style.left="50%";e.style.top="50%";
+    document.body.appendChild(e);
+    setTimeout(()=>e.remove(),700);
+  }
+}
+
+function startFinal(){
+  let n=10;
+  final.style.display="block";
+  const t=setInterval(()=>{
+    final.textContent=`This message will self-destruct in ${n} seconds… I love you, bye 💖`;
+    n--;
+    if(n<0){
+      clearInterval(t);
+      explode(40);
+      card.remove();
+      reload.style.display="block";
     }
+  },1000);
+}
 
-    function evade(btn){
-      if(btn.dataset.evade)return;
-      document.addEventListener("mousemove",e=>{
-        const r=btn.getBoundingClientRect();
-        const d=Math.hypot(
-          e.clientX-(r.left+r.width/2),
-          e.clientY-(r.top+r.height/2)
-        );
-        if(d<140)move(btn);
-      });
-      btn.addEventListener("touchstart",(e)=>{ e.preventDefault(); move(btn); },{passive:false});
-      btn.dataset.evade=1;
+function maybeFinal(){
+  if(cancelFinished && instructionsOpened){
+    startFinal();
+  }
+}
+
+function selfDestructCancel(){
+  let n=5;
+  const t=setInterval(()=>{
+    cancelBtn.innerHTML=`This cancel option will self-destruct in ${n}…`;
+    n--;
+    if(n<0){
+      clearInterval(t);
+      explode(20);
+      cancelBtn.remove();
+      cancelFinished=true;
+      maybeFinal();
     }
+  },1000);
+}
 
-    evade(noBtn);
-    window.onload=()=>move(noBtn);
+cancelBtn.onclick=()=>{
+  if(stage===0){
+    stage=1;
+    cancelBtn.textContent="Moriah Tess Miller — Don’t you dare to click here again!!";
+    cancelBtn.style.background="#fb7185";
+  }else if(stage===1){
+    stage=2;
+    cancelBtn.textContent="REALLY?!?! 😭";
+    cancelBtn.style.background="#ef4444";
+  }else if(stage===2){
+    stage=3;
+    cancelBtn.innerHTML="Click to cancel<br><span>(if you can)</span>";
+    cancelBtn.style.background="#7c3aed";
+    evade(cancelBtn); move(cancelBtn);
+    setTimeout(selfDestructCancel,5000);
+  }
+};
+</script>
 
-    yesBtn.onclick=()=>{
-      msg.textContent="Yeeiii 💖 that’s the right answer! 😍";
-      heartWrap.style.display="flex";
-      afterYesBtns.style.display="flex";
-      noBtn.classList.add("hidden");
-    };
-
-    instructionsBtn.onclick=()=>{
-      instructionsPanel.style.display="block";
-      instructionsPanel.scrollIntoView({behavior:"smooth"});
-    };
-
-    function spawnExplosion(count=26){
-      const emojis=["💥","✨","💖","🔥","💣","💫","💘"];
-      for(let i=0;i<count;i++){
-        const s=document.createElement("div");
-        s.className="pop";
-        s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-        s.style.left=(window.innerWidth/2+(Math.random()*180-90))+"px";
-        s.style.top=(window.innerHeight/2+(Math.random()*120-60))+"px";
-        s.style.setProperty("--dx",(Math.random()*520-260)+"px");
-        s.style.setProperty("--dy",(Math.random()*420-210)+"px");
-        document.body.appendChild(s);
-        setTimeout(()=>s.remove(),700);
-      }
-    }
-
-    function startFinalCountdownThenNuke(){
-      let n=10;
-      finalCountdown.style.display="block";
-
-      const render=()=>{
-        finalCountdown.textContent =
-          `This message will self-destruct in ${n} seconds… I love you, bye 💖`;
-      };
-      render();
-      finalCountdown.scrollIntoView({behavior:"smooth", block:"center"});
-
-      const t=setInterval(()=>{
-        n--;
-        if(n<=0){
-          clearInterval(t);
-
-          // EXPLOTA TODO
-          spawnExplosion(36);
-
-          // Oculta todo el contenido principal
-          card.style.opacity="0";
-          setTimeout(()=>{
-            card.remove();
-            reloadMsg.style.display="block";
-          }, 350);
-        }else{
-          render();
-        }
-      },1000);
-    }
-
-    function selfDestructCancelButton(btn){
-      let n=5;
-      btn.innerHTML=`This cancel option will self-destruct in ${n}…`;
-      evade(btn); move(btn);
-
-      const t=setInterval(()=>{
-        n--;
-        if(n<=0){
-          clearInterval(t);
-
-          spawnExplosion(20);
-          btn.remove();
-
-          // Ahora en vez de “only one option left”, hacemos el final de 10s + nukear todo
-          startFinalCountdownThenNuke();
-        }else{
-          btn.innerHTML=`This cancel option will self-destruct in ${n}…`;
-        }
-      },1000);
-    }
-
-    cancelBtn.onclick=()=>{
-      if(stage===0){
-        stage=1;
-        cancelBtn.textContent="Moriah Tess Miller — Don’t you dare to click here again!!";
-        cancelBtn.style.background="#fb7185";
-        return;
-      }
-      if(stage===1){
-        stage=2;
-        cancelBtn.textContent="REALLY?!?! 😭";
-        cancelBtn.style.background="#ef4444";
-        return;
-      }
-      if(stage===2){
-        stage=3;
-        cancelBtn.innerHTML="Click to cancel<br><span>(if you can)</span>";
-        cancelBtn.style.background="#7c3aed";
-        evade(cancelBtn);
-        move(cancelBtn);
-
-        setTimeout(()=>selfDestructCancelButton(cancelBtn),5000);
-      }
-    };
-  </script>
 </body>
 </html>
