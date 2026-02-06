@@ -26,8 +26,9 @@
       padding:48px 42px;
       border-radius:22px;
       box-shadow:var(--shadow);
-      width:min(860px,94vw);
+      width:min(880px,94vw);
       text-align:center;
+      position:relative;
     }
 
     h1{margin:0 0 14px;font-size:32px;}
@@ -127,10 +128,12 @@
       text-align:left;
     }
 
-    .boom{
+    .finalCountdown{
       display:none;
-      margin-top:14px;
+      margin-top:16px;
       font-weight:900;
+      color:#111827;
+      font-size:17px;
     }
 
     .pop{
@@ -138,6 +141,7 @@
       font-size:26px;
       animation:pop 650ms ease-out forwards;
       pointer-events:none;
+      filter:drop-shadow(0 10px 14px rgba(0,0,0,.18));
     }
 
     @keyframes pop{
@@ -146,11 +150,25 @@
     }
 
     .hidden{display:none!important;}
+
+    /* Mensaje final al final de TODO */
+    .reloadMsg{
+      display:none;
+      font-size:20px;
+      font-weight:900;
+      color:#111827;
+      background:white;
+      padding:18px 18px;
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      text-align:center;
+      width:min(740px,92vw);
+    }
   </style>
 </head>
 
 <body>
-  <div class="card">
+  <div class="card" id="card">
     <h1>Tess Miller (a.k.a. mi guapa), would you be my Valentine? 💘</h1>
     <p>FYI there is only one right answer 👀💖</p>
 
@@ -183,12 +201,15 @@
       </div>
     </div>
 
-    <div class="boom" id="afterBoomText">
-      Well… there is only one option left 😌💖
-    </div>
+    <div class="finalCountdown" id="finalCountdown"></div>
+  </div>
+
+  <div class="reloadMsg" id="reloadMsg">
+    Reload the website to see this message again 😘
   </div>
 
   <script>
+    const card=document.getElementById("card");
     const arena=document.getElementById("arena");
     const noBtn=document.getElementById("no");
     const yesBtn=document.getElementById("yes");
@@ -198,7 +219,8 @@
     const instructionsBtn=document.getElementById("instructionsBtn");
     const cancelBtn=document.getElementById("cancelBtn");
     const instructionsPanel=document.getElementById("instructionsPanel");
-    const afterBoomText=document.getElementById("afterBoomText");
+    const finalCountdown=document.getElementById("finalCountdown");
+    const reloadMsg=document.getElementById("reloadMsg");
 
     let stage=0;
 
@@ -219,6 +241,7 @@
         );
         if(d<140)move(btn);
       });
+      btn.addEventListener("touchstart",(e)=>{ e.preventDefault(); move(btn); },{passive:false});
       btn.dataset.evade=1;
     }
 
@@ -237,29 +260,67 @@
       instructionsPanel.scrollIntoView({behavior:"smooth"});
     };
 
-    function explode(){
-      ["💥","💖","🔥","✨"].forEach(()=>{
+    function spawnExplosion(count=26){
+      const emojis=["💥","✨","💖","🔥","💣","💫","💘"];
+      for(let i=0;i<count;i++){
         const s=document.createElement("div");
         s.className="pop";
-        s.textContent=["💥","💖","🔥","✨"][Math.floor(Math.random()*4)];
-        s.style.setProperty("--dx",(Math.random()*400-200)+"px");
-        s.style.setProperty("--dy",(Math.random()*300-150)+"px");
+        s.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+        s.style.left=(window.innerWidth/2+(Math.random()*180-90))+"px";
+        s.style.top=(window.innerHeight/2+(Math.random()*120-60))+"px";
+        s.style.setProperty("--dx",(Math.random()*520-260)+"px");
+        s.style.setProperty("--dy",(Math.random()*420-210)+"px");
         document.body.appendChild(s);
         setTimeout(()=>s.remove(),700);
-      });
+      }
     }
 
-    function selfDestruct(btn){
-      let n=5;
-      btn.innerHTML=`This cancel option will self-destruct in ${n}…`;
-      evade(btn); move(btn);
+    function startFinalCountdownThenNuke(){
+      let n=10;
+      finalCountdown.style.display="block";
+
+      const render=()=>{
+        finalCountdown.textContent =
+          `This message will self-destruct in ${n} seconds… I love you, bye 💖`;
+      };
+      render();
+      finalCountdown.scrollIntoView({behavior:"smooth", block:"center"});
+
       const t=setInterval(()=>{
         n--;
         if(n<=0){
           clearInterval(t);
-          explode();
+
+          // EXPLOTA TODO
+          spawnExplosion(36);
+
+          // Oculta todo el contenido principal
+          card.style.opacity="0";
+          setTimeout(()=>{
+            card.remove();
+            reloadMsg.style.display="block";
+          }, 350);
+        }else{
+          render();
+        }
+      },1000);
+    }
+
+    function selfDestructCancelButton(btn){
+      let n=5;
+      btn.innerHTML=`This cancel option will self-destruct in ${n}…`;
+      evade(btn); move(btn);
+
+      const t=setInterval(()=>{
+        n--;
+        if(n<=0){
+          clearInterval(t);
+
+          spawnExplosion(20);
           btn.remove();
-          afterBoomText.style.display="block";
+
+          // Ahora en vez de “only one option left”, hacemos el final de 10s + nukear todo
+          startFinalCountdownThenNuke();
         }else{
           btn.innerHTML=`This cancel option will self-destruct in ${n}…`;
         }
@@ -285,7 +346,8 @@
         cancelBtn.style.background="#7c3aed";
         evade(cancelBtn);
         move(cancelBtn);
-        setTimeout(()=>selfDestruct(cancelBtn),5000);
+
+        setTimeout(()=>selfDestructCancelButton(cancelBtn),5000);
       }
     };
   </script>
