@@ -25,22 +25,24 @@ button{
   border:0;padding:12px 18px;border-radius:12px;
   font-size:16px;font-weight:800;cursor:pointer;
   box-shadow:0 10px 20px rgba(0,0,0,.1);
+  transition:opacity .2s ease;
 }
-#yes{background:#22c55e;color:#fff;}
+#yes{background:#22c55e;color:#fff;min-width:130px;}
 #no{background:#ef4444;color:#fff;position:absolute;}
 
-.msg{margin-top:16px;font-weight:900;color:var(--pink);}
+.msg{margin-top:16px;font-weight:900;color:var(--pink);min-height:28px;}
 .heartWrap{display:none;justify-content:center;gap:8px;margin-top:12px;}
-.heart{width:26px;height:26px;background:var(--pink);transform:rotate(45deg);animation:beat 1s infinite;position:relative;}
+.heart{width:26px;height:26px;background:var(--pink);transform:rotate(45deg);animation:beat 1s infinite;position:relative;border-radius:6px;}
 .heart:before,.heart:after{content:"";width:26px;height:26px;background:var(--pink);border-radius:50%;position:absolute;}
 .heart:before{left:-13px;}
 .heart:after{top:-13px;}
 @keyframes beat{50%{transform:rotate(45deg) scale(1.25);}}
 
 .afterYesBtns{display:none;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:14px;}
+.afterYesBtns button{min-width:300px;}
 #instructionsBtn{background:#111827;color:#fff;}
 #cancelBtn{background:#f97316;color:#fff;}
-#cancelBtn span{display:block;font-size:13px;margin-top:6px;}
+#cancelBtn span{display:block;font-size:13px;margin-top:6px;opacity:.95;font-weight:650;}
 
 .panel{
   display:none;margin:18px auto 0;max-width:720px;
@@ -48,10 +50,20 @@ button{
   padding:16px;text-align:left;
 }
 
-.final{display:none;font-weight:900;font-size:18px;margin-top:16px;}
-.reload{display:none;font-size:20px;font-weight:900;}
+/* Mensaje “solo queda una opción” */
+.oneOption{
+  display:none;
+  margin-top:14px;
+  font-weight:900;
+  font-size:18px;
+  color:#111827;
+}
 
-.pop{position:fixed;font-size:26px;animation:pop .7s forwards;}
+/* Mensaje final countdown */
+.final{display:none;font-weight:900;font-size:18px;margin-top:16px;color:#111827;}
+.reload{display:none;font-size:20px;font-weight:900;color:#111827;background:#fff;padding:16px 18px;border-radius:18px;box-shadow:var(--shadow);text-align:center;width:min(740px,92vw);}
+
+.pop{position:fixed;font-size:26px;animation:pop .7s forwards;pointer-events:none;filter:drop-shadow(0 10px 14px rgba(0,0,0,.18));}
 @keyframes pop{to{transform:translate(var(--dx),var(--dy)) scale(1.3);opacity:0;}}
 .hidden{display:none!important;}
 </style>
@@ -79,6 +91,10 @@ button{
     <button id="cancelBtn">CANCEL INVITE<span>(do not press)</span></button>
   </div>
 
+  <div class="oneOption" id="oneOption">
+    Well… there’s only one option now 😌💖
+  </div>
+
   <div class="panel" id="instructions">
     <p>
       You are cordially invited to your first Valentine’s Day with your sexy Spaniard
@@ -86,6 +102,9 @@ button{
       Quadrant A3 (the kitchen bar).
       <br><br>See ya soon, ti adoro 💖
     </p>
+    <div class="heartWrap" style="display:flex;margin-top:10px;">
+      <div class="heart"></div>
+    </div>
   </div>
 
   <div class="final" id="final"></div>
@@ -102,17 +121,21 @@ const yesBtn=document.getElementById("yes");
 const cancelBtn=document.getElementById("cancelBtn");
 const instructionsBtn=document.getElementById("instructionsBtn");
 const instructions=document.getElementById("instructions");
-const final=document.getElementById("final");
-const reload=document.getElementById("reload");
 const hearts=document.getElementById("hearts");
 const afterYes=document.getElementById("afterYes");
 const msg=document.getElementById("msg");
 const card=document.getElementById("card");
+const final=document.getElementById("final");
+const reload=document.getElementById("reload");
+const oneOption=document.getElementById("oneOption");
 
-let cancelFinished=false;
-let instructionsOpened=false;
 let stage=0;
 
+// flags de lógica
+let cancelFinished=false;
+let finalStarted=false;
+
+// --- movimiento / evasión ---
 function move(btn){
   const r=arena.getBoundingClientRect(),b=btn.getBoundingClientRect();
   btn.style.position="absolute";
@@ -123,13 +146,57 @@ function evade(btn){
   if(btn.dataset.evade)return;
   document.addEventListener("mousemove",e=>{
     const r=btn.getBoundingClientRect();
-    if(Math.hypot(e.clientX-(r.left+r.width/2),e.clientY-(r.top+r.height/2))<140)move(btn);
+    const d=Math.hypot(
+      e.clientX-(r.left+r.width/2),
+      e.clientY-(r.top+r.height/2)
+    );
+    if(d<140) move(btn);
   });
+  btn.addEventListener("touchstart",(e)=>{e.preventDefault();move(btn);},{passive:false});
   btn.dataset.evade=1;
 }
+evade(noBtn);
+window.addEventListener("load",()=>move(noBtn));
 
-evade(noBtn); window.onload=()=>move(noBtn);
+// --- FX ---
+function explode(count=30){
+  const emojis=["💥","✨","💖","🔥","💣","💫","💘"];
+  for(let i=0;i<count;i++){
+    const e=document.createElement("div");
+    e.className="pop";
+    e.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+    e.style.left="50%";
+    e.style.top="50%";
+    e.style.setProperty("--dx",(Math.random()*520-260)+"px");
+    e.style.setProperty("--dy",(Math.random()*420-210)+"px");
+    document.body.appendChild(e);
+    setTimeout(()=>e.remove(),700);
+  }
+}
 
+// --- final ---
+function startFinalCountdown(){
+  if(finalStarted) return;
+  finalStarted=true;
+
+  let n=10;
+  final.style.display="block";
+
+  const tick=()=>{
+    final.textContent=`This message will self-destruct in ${n} seconds… I love you, bye 💖`;
+    n--;
+    if(n<0){
+      explode(42);
+      card.remove();
+      reload.style.display="block";
+      clearInterval(t);
+    }
+  };
+  tick();
+  const t=setInterval(tick,1000);
+}
+
+// --- eventos ---
 yesBtn.onclick=()=>{
   msg.textContent="Yeeiii 💖 that’s the right answer! 😍";
   hearts.style.display="flex";
@@ -138,56 +205,33 @@ yesBtn.onclick=()=>{
 };
 
 instructionsBtn.onclick=()=>{
-  instructionsOpened=true;
+  // siempre puede ver instrucciones, pero:
+  // si cancel ya terminó, entonces:
+  // 1) escondemos el letrero “one option now”
+  // 2) arrancamos el final de 10s
   instructions.style.display="block";
-  maybeFinal();
+  instructions.scrollIntoView({behavior:"smooth",block:"center"});
+
+  if(cancelFinished){
+    oneOption.style.display="none";
+    startFinalCountdown();
+  }
 };
 
-function explode(count=30){
-  for(let i=0;i<count;i++){
-    const e=document.createElement("div");
-    e.className="pop";
-    e.textContent=["💥","💖","✨","🔥"][Math.floor(Math.random()*4)];
-    e.style.setProperty("--dx",(Math.random()*500-250)+"px");
-    e.style.setProperty("--dy",(Math.random()*400-200)+"px");
-    e.style.left="50%";e.style.top="50%";
-    document.body.appendChild(e);
-    setTimeout(()=>e.remove(),700);
-  }
-}
-
-function startFinal(){
-  let n=10;
-  final.style.display="block";
-  const t=setInterval(()=>{
-    final.textContent=`This message will self-destruct in ${n} seconds… I love you, bye 💖`;
-    n--;
-    if(n<0){
-      clearInterval(t);
-      explode(40);
-      card.remove();
-      reload.style.display="block";
-    }
-  },1000);
-}
-
-function maybeFinal(){
-  if(cancelFinished && instructionsOpened){
-    startFinal();
-  }
-}
-
-function selfDestructCancel(){
+function selfDestructCancelButton(){
   let n=5;
   const t=setInterval(()=>{
     cancelBtn.innerHTML=`This cancel option will self-destruct in ${n}…`;
     n--;
     if(n<0){
       clearInterval(t);
-      explode(20);
+      explode(22);
       cancelBtn.remove();
       cancelFinished=true;
-      maybeFinal();
+
+      // Aquí va tu “camino”: ya solo queda instructions
+      oneOption.style.display="block";
+      oneOption.scrollIntoView({behavior:"smooth",block:"center"});
     }
   },1000);
 }
@@ -197,16 +241,24 @@ cancelBtn.onclick=()=>{
     stage=1;
     cancelBtn.textContent="Moriah Tess Miller — Don’t you dare to click here again!!";
     cancelBtn.style.background="#fb7185";
-  }else if(stage===1){
+    return;
+  }
+  if(stage===1){
     stage=2;
     cancelBtn.textContent="REALLY?!?! 😭";
     cancelBtn.style.background="#ef4444";
-  }else if(stage===2){
+    return;
+  }
+  if(stage===2){
     stage=3;
     cancelBtn.innerHTML="Click to cancel<br><span>(if you can)</span>";
     cancelBtn.style.background="#7c3aed";
-    evade(cancelBtn); move(cancelBtn);
-    setTimeout(selfDestructCancel,5000);
+
+    evade(cancelBtn);
+    move(cancelBtn);
+
+    // 5s después empieza el self destruct
+    setTimeout(selfDestructCancelButton,5000);
   }
 };
 </script>
